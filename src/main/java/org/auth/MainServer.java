@@ -55,20 +55,31 @@ public class MainServer {
             if (t.getRequestMethod().equalsIgnoreCase("POST")) {
                 String requestBody = Utils.convertStreamToString(t.getRequestBody());
                 String[] params = requestBody.split("&");
-                String[] usernameParams = params[0].split("=");
-                String username = usernameParams[1];
-                if (!username.isEmpty()) {
-                    String password = generatePassword();
-                    addUser(username, password);
-                    printUserPasswords(); // Виведення зареєстрованих користувачів
-                    response = "<!DOCTYPE html><html><head><title>Success</title></head><body><h1>Success</h1><div><p>You have successfully registered. Your password: " + password + "</p></div></body></html>";
+                if (params.length > 0) {
+                    String[] usernameParams = params[0].split("=");
+                    if (usernameParams.length > 1 && !usernameParams[1].isBlank()) {
+                        String username = usernameParams[1];
+                        String password = generatePassword();
+                        addUser(username, password);
+                        printUserPasswords(); // Виведення зареєстрованих користувачів
+                        response = "<!DOCTYPE html><html><head><title>Success</title></head><body><h1>Success</h1><div><p>You have successfully registered. Your password: " + password + "</p></div></body></html>";
+                        t.sendResponseHeaders(200, response.length());
+                        OutputStream os = t.getResponseBody();
+                        os.write(response.getBytes());
+                        os.close();
+                    } else {
+                        response = "<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Error</h1><div><p><span id=\"errorMessage\">Username must be filled</span></p></div></body></html>";
+                        t.sendResponseHeaders(200, response.length());
+                        OutputStream os = t.getResponseBody();
+                        os.write(response.getBytes());
+                        os.close();
+                    }
+                } else {
+                    response = "<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Error</h1><div><p><span id=\"errorMessage\">Data must be filled</span></p></div></body></html>";
                     t.sendResponseHeaders(200, response.length());
                     OutputStream os = t.getResponseBody();
                     os.write(response.getBytes());
                     os.close();
-                } else {
-                    t.getResponseHeaders().set("Location", "/error.html");
-                    t.sendResponseHeaders(302, -1);
                 }
             } else {
                 response = "<!DOCTYPE html><html><head><title>Registration</title></head><body><h1>Registration</h1><div><form action=\"/register\" method=\"post\"><label for=\"registerUsername\">Username:</label><br><input type=\"text\" id=\"registerUsername\" name=\"username\"><br><br><input type=\"submit\" value=\"Register\"></form></div></body></html>";
@@ -77,9 +88,12 @@ public class MainServer {
                 os.write(response.getBytes());
                 os.close();
             }
-        }}
+        }
+    }
 
-        static String generatePassword() {
+
+
+    static String generatePassword() {
             Random random = new Random();
             int code = 100000 + random.nextInt(900000);
             return String.valueOf(code); // Повернення паролю у форматі рядка
