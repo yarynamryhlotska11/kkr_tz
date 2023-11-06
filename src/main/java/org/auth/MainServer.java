@@ -1,5 +1,9 @@
 package org.auth;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -12,6 +16,7 @@ import java.util.Random;
 
 public class MainServer {
     static Map<String, String> userPasswords = new HashMap<>();
+    static Map<String, String> userSalts = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
@@ -30,14 +35,37 @@ public class MainServer {
     public static void printUserPasswords() {
         System.out.println("Registered Users:");
         for (Map.Entry<String, String> entry : userPasswords.entrySet()) {
-            System.out.println("Username: " + entry.getKey() + ", Password: " + entry.getValue());
+            System.out.println("Username: " + entry.getKey() + ", Password: " + entry.getValue() + ", Salt: " + userSalts.get(entry.getKey()));
         }
     }
 
-    static void addUser(String username, String password) {
-        userPasswords.put(username.trim(), password.trim()); // Збереження пароля для користувача
+    // Генерувати сіль
+    private static String generateSalt() {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+        return new String(salt, StandardCharsets.UTF_8);
     }
 
+    // Повернення хешу пароля з використанням солі
+    private static String hashPassword(String password, String salt) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            String toHash = password + salt;
+            byte[] encodedHash = digest.digest(toHash.getBytes(StandardCharsets.UTF_8));
+            return new String(encodedHash, StandardCharsets.UTF_8);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    static void addUser(String username, String password) {
+        String salt = generateSalt(); // Генерація солі
+        String hashedPassword = hashPassword(password, salt); // Хешування пароля з сіллю
+        userPasswords.put(username.trim(), hashedPassword.trim()); // Збереження хешованого пароля для користувача
+        userSalts.put(username.trim(), salt); // Збереження солі для користувача
+    }
 
     static class HomeHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
@@ -51,7 +79,7 @@ public class MainServer {
 
     static class RegisterHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-            String response;
+            String response = "";
             if (t.getRequestMethod().equalsIgnoreCase("POST")) {
                 String requestBody = Utils.convertStreamToString(t.getRequestBody());
                 String[] params = requestBody.split("&");
@@ -94,13 +122,13 @@ public class MainServer {
 
 
     static String generatePassword() {
-            Random random = new Random();
-            int code = 100000 + random.nextInt(900000);
-            return String.valueOf(code); // Повернення паролю у форматі рядка
-        }
+        Random random = new Random();
+        int code = 100000 + random.nextInt(900000);
+        return String.valueOf(code); // Повернення паролю у форматі рядка
+    }
 
 
-        static class LoginHandler implements HttpHandler {
+    static class LoginHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
             if (t.getRequestMethod().equals("POST")) {
                 String requestBody = Utils.convertStreamToString(t.getRequestBody());
@@ -109,11 +137,7 @@ public class MainServer {
                 String username = parameters.get("username").trim(); // Обрізання зайвих пробілів
                 String password = parameters.get("password").trim(); // Обрізання зайвих пробілів
 
-                System.out.println("Input username: " + username);
-                System.out.println("Input password: " + password);
-                System.out.println("Stored password for the username: " + userPasswords.get(username));
-
-                if (userPasswords.containsKey(username) && userPasswords.get(username).equals(password)) {
+                if (userPasswords.containsKey(username) && userPasswords.get(username).equals(hashPassword(password, userSalts.get(username)))) {
                     t.getResponseHeaders().set("Location", "/homepage");
                     t.sendResponseHeaders(302, -1); // Перенаправлення на домашню сторінку
                 } else {
@@ -152,4 +176,3 @@ public class MainServer {
         }
     }
 }
-
