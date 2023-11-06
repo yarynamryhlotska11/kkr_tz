@@ -73,7 +73,15 @@ public class MainServer {
 
     static class HomeHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-            String response = "<!DOCTYPE html><html><head><title>Bootstrap Server</title></head><body><div><h3>Choose an option</h3><a href=\"/register\">Register</a><br><a href=\"/login\">Login</a></div></body></html>";
+            String response = "<!DOCTYPE html><html><head><title>Bootstrap Server</title>" +
+                    "<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\">" +
+                    "<style>body {background-color: #f8e0e6;color: #555;}" +
+                    ".container {background-color: #fff;padding: 20px;border-radius: 5px;margin-top: 50px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);} " +
+                    "a.btn {color: #fff;} a.btn-primary {background-color: #ff1493;} a.btn-secondary {background-color: #555;}</style></head>" +
+                    "<body><div class=\"container\"><div class=\"mt-4\">" +
+                    "<h3>Choose an option</h3><a href=\"/register\" class=\"btn btn-primary mr-2\">Register</a><a href=\"/login\" class=\"btn btn-secondary\">Login</a></div></div>" +
+                    "<script src=\"https://code.jquery.com/jquery-3.3.1.slim.min.js\"></script><script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js\"></script>" +
+                    "<script src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js\"></script></body></html>";
             t.sendResponseHeaders(200, response.length());
             OutputStream os = t.getResponseBody();
             os.write(response.getBytes());
@@ -84,7 +92,18 @@ public class MainServer {
 
     static class RegisterHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-            String response = "";
+            String response = "<!DOCTYPE html><html><head><title>Registration</title>" +
+                    "<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\">" +
+                    "<style>body {background-color: #f8e0e6;color: #555;}" +
+                    ".container {background-color: #fff;padding: 20px;border-radius: 5px;margin-top: 50px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);} " +
+                    "input[type=\"text\"] {width: 100%;padding: 12px 20px;margin: 8px 0;display: inline-block;border: 1px solid #ccc;border-radius: 4px;box-sizing: border-box;}" +
+                    "input[type=\"submit\"] {width: 100%;background-color: #ff1493;color: white;padding: 14px 20px;margin: 8px 0;border: none;border-radius: 4px;cursor: pointer;}</style></head>" +
+                    "<body><div class=\"container\"><h1>Registration</h1><div><form action=\"/register\" method=\"post\">" +
+                    "<label for=\"registerUsername\">Username:</label><br><input type=\"text\" id=\"registerUsername\" name=\"username\"><br><br>" +
+                    "<input type=\"submit\" value=\"Register\"></form></div></div>" +
+                    "<script src=\"https://code.jquery.com/jquery-3.3.1.slim.min.js\"></script><script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js\"></script>" +
+                    "<script src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js\"></script></body></html>";
+
             if (t.getRequestMethod().equalsIgnoreCase("POST")) {
                 String requestBody = Utils.convertStreamToString(t.getRequestBody());
                 String[] params = requestBody.split("&");
@@ -104,7 +123,16 @@ public class MainServer {
                         String password = generatePassword();
                         addUser(username, password);
                         printUserPasswords(); // Display registered users
-                        response = "<!DOCTYPE html><html><head><title>Success</title><meta http-equiv=\"refresh\" content=\"60; url=/login\"></head><body><h1>Success</h1><div><p>You have successfully registered. Your password: " + password + "</p><p>Redirecting to login page...</p></div></body></html>";
+                        response = "<!DOCTYPE html><html><head><title>Success</title>" +
+                                "<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\">" +
+                                "<style>body {background-color: #f8e0e6;color: #555;}" +
+                                ".container {background-color: #fff;padding: 20px;border-radius: 5px;margin-top: 50px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);}" +
+                                "a {color: #ff1493; text-decoration: none;}</style></head>" +
+                                "<body><div class=\"container\"><h1>Success</h1><div>" +
+                                "<p>You have successfully registered. Your password: " + password + "</p>" +
+                                "<p>Redirecting to <a href=\"/login\">login page</a>...</p></div></div>" +
+                                "<script src=\"https://code.jquery.com/jquery-3.3.1.slim.min.js\"></script><script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js\"></script>" +
+                                "<script src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js\"></script></body></html>";
                         t.sendResponseHeaders(200, response.length());
                         OutputStream os = t.getResponseBody();
                         os.write(response.getBytes());
@@ -120,8 +148,8 @@ public class MainServer {
                     return;
                 }
             } else {
-                response = "<!DOCTYPE html><html><head><title>Registration</title></head><body><h1>Registration</h1><div><form action=\"/register\" method=\"post\"><label for=\"registerUsername\">Username:</label><br><input type=\"text\" id=\"registerUsername\" name=\"username\"><br><br><input type=\"submit\" value=\"Register\"></form></div></body></html>";
-                t.sendResponseHeaders(200, response.length());
+                t.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
+                t.sendResponseHeaders(200, response.getBytes().length);
                 OutputStream os = t.getResponseBody();
                 os.write(response.getBytes());
                 os.close();
@@ -131,23 +159,49 @@ public class MainServer {
 
     static class ErEmptyHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-            String response = "<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Error</h1><div><p><span id=\"errorMessage\">Field must not be empty</span></p><form action=\"/register\" method=\"post\"><label for=\"registerUsername\">Username:</label><br><input type=\"text\" id=\"registerUsername\" name=\"username\"><br><br><input type=\"submit\" value=\"Register\"></form></div></body></html>";
-            t.sendResponseHeaders(200, response.length());
+            String response = "<!DOCTYPE html><html><head><title>Error</title>" +
+                    "<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\">" +
+                    "<style>body {background-color: #f8e0e6;color: #555;}" +
+                    ".container {background-color: #fff;padding: 20px;border-radius: 5px;margin-top: 50px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);} " +
+                    "input[type=\"text\"] {width: 100%;padding: 12px 20px;margin: 8px 0;display: inline-block;border: 1px solid #ccc;border-radius: 4px;box-sizing: border-box;}" +
+                    "input[type=\"submit\"] {width: 100%;background-color: #ff1493;color: white;padding: 14px 20px;margin: 8px 0;border: none;border-radius: 4px;cursor: pointer;}</style></head>" +
+                    "<body><div class=\"container\"><h1>Error</h1><div><p><span id=\"errorMessage\">Field must not be empty</span></p><form action=\"/register\" method=\"post\">" +
+                    "<label for=\"registerUsername\">Username:</label><br><input type=\"text\" id=\"registerUsername\" name=\"username\"><br><br>" +
+                    "<input type=\"submit\" value=\"Register\"></form></div></div>" +
+                    "<script src=\"https://code.jquery.com/jquery-3.3.1.slim.min.js\"></script><script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js\"></script>" +
+                    "<script src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js\"></script></body></html>";
+
+            t.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
+            t.sendResponseHeaders(200, response.getBytes().length);
             OutputStream os = t.getResponseBody();
             os.write(response.getBytes());
             os.close();
         }
     }
 
+
     static class ErRegHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-            String response = "<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Error</h1><div><p><span id=\"errorMessage\">Username must be filled and contain only English characters</span></p><form action=\"/register\" method=\"post\"><label for=\"registerUsername\">Username:</label><br><input type=\"text\" id=\"registerUsername\" name=\"username\"><br><br><input type=\"submit\" value=\"Register\"></form></div></body></html>";
-            t.sendResponseHeaders(200, response.length());
+            String response = "<!DOCTYPE html><html><head><title>Error</title>" +
+                    "<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\">" +
+                    "<style>body {background-color: #f8e0e6;color: #555;}" +
+                    ".container {background-color: #fff;padding: 20px;border-radius: 5px;margin-top: 50px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);} " +
+                    "input[type=\"text\"] {width: 100%;padding: 12px 20px;margin: 8px 0;display: inline-block;border: 1px solid #ccc;border-radius: 4px;box-sizing: border-box;}" +
+                    "input[type=\"submit\"] {width: 100%;background-color: #ff1493;color: white;padding: 14px 20px;margin: 8px 0;border: none;border-radius: 4px;cursor: pointer;}</style></head>" +
+                    "<body><div class=\"container\"><h1>Error</h1><div><p><span id=\"errorMessage\">Username must be filled and contain only English characters</span></p><form action=\"/register\" method=\"post\">" +
+                    "<label for=\"registerUsername\">Username:</label><br><input type=\"text\" id=\"registerUsername\" name=\"username\"><br><br>" +
+                    "<input type=\"submit\" value=\"Register\"></form></div></div>" +
+                    "<script src=\"https://code.jquery.com/jquery-3.3.1.slim.min.js\"></script><script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js\"></script>" +
+                    "<script src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js\"></script></body></html>";
+
+            t.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
+            t.sendResponseHeaders(200, response.getBytes().length);
             OutputStream os = t.getResponseBody();
             os.write(response.getBytes());
             os.close();
         }
     }
+
 
 
 
@@ -175,10 +229,21 @@ public class MainServer {
                     t.sendResponseHeaders(302, -1); // Перенаправлення на сторінку помилки
                 }
             } else {
-                // Обробка GET-запиту для сторінки входу
-                // Генерація простої форми входу
-                String response = "<!DOCTYPE html><html><head><title>Login</title></head><body><h1>Login</h1><div><form action=\"/login\" method=\"post\"><label for=\"loginUsername\">Username:</label><br><input type=\"text\" id=\"loginUsername\" name=\"username\"><br><label for=\"loginPassword\">Password:</label><br><input type=\"password\" id=\"loginPassword\" name=\"password\"><br><br><input type=\"submit\" value=\"Login\"></form></div></body></html>";
-                t.sendResponseHeaders(200, response.length());
+                String response = "<!DOCTYPE html><html><head><title>Login</title>" +
+                        "<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\">" +
+                        "<style>body {background-color: #f8e0e6;color: #555;}" +
+                        ".container {background-color: #fff;padding: 20px;border-radius: 5px;margin-top: 50px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);} " +
+                        "input[type=\"text\"], input[type=\"password\"] {width: 100%;padding: 12px 20px;margin: 8px 0;display: inline-block;border: 1px solid #ccc;border-radius: 4px;box-sizing: border-box;}" +
+                        "input[type=\"submit\"] {width: 100%;background-color: #ff1493;color: white;padding: 14px 20px;margin: 8px 0;border: none;border-radius: 4px;cursor: pointer;}</style></head>" +
+                        "<body><div class=\"container\"><h1>Login</h1><div><form action=\"/login\" method=\"post\">" +
+                        "<label for=\"loginUsername\">Username:</label><br><input type=\"text\" id=\"loginUsername\" name=\"username\"><br>" +
+                        "<label for=\"loginPassword\">Password:</label><br><input type=\"password\" id=\"loginPassword\" name=\"password\"><br><br>" +
+                        "<input type=\"submit\" value=\"Login\"></form></div></div>" +
+                        "<script src=\"https://code.jquery.com/jquery-3.3.1.slim.min.js\"></script><script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js\"></script>" +
+                        "<script src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js\"></script></body></html>";
+
+                t.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
+                t.sendResponseHeaders(200, response.getBytes().length);
                 OutputStream os = t.getResponseBody();
                 os.write(response.getBytes());
                 os.close();
@@ -187,24 +252,48 @@ public class MainServer {
     }
 
 
+
     static class HomePageHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-            String response = "<!DOCTYPE html><html><head><title>Home Page</title></head><body><h1>Home Page</h1><div><p>Welcome to the home page</p></div></body></html>";
-            t.sendResponseHeaders(200, response.length());
+            String response = "<!DOCTYPE html><html><head><title>Home Page</title>" +
+                    "<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\">" +
+                    "<style>body {background-color: #f8e0e6;color: #555;}" +
+                    ".container {background-color: #fff;padding: 20px;border-radius: 5px;margin-top: 50px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);}</style></head>" +
+                    "<body><div class=\"container\"><h1>Home Page</h1><div><p>Welcome to the home page</p></div></div>" +
+                    "<script src=\"https://code.jquery.com/jquery-3.3.1.slim.min.js\"></script><script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js\"></script>" +
+                    "<script src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js\"></script></body></html>";
+
+            t.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
+            t.sendResponseHeaders(200, response.getBytes().length);
             OutputStream os = t.getResponseBody();
             os.write(response.getBytes());
             os.close();
         }
     }
+
     static class ErHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-            String response = "<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Error</h1><div><p><span id=\"errorMessage\">Invalid username or password</span></p><form action=\"/login\" method=\"post\"><label for=\"loginUsername\">Username:</label><br><input type=\"text\" id=\"loginUsername\" name=\"username\"><br><label for=\"loginPassword\">Password:</label><br><input type=\"password\" id=\"loginPassword\" name=\"password\"><br><br><input type=\"submit\" value=\"Login\"></form></div></body></html>";
-            t.sendResponseHeaders(200, response.length());
+            String response = "<!DOCTYPE html><html><head><title>Error</title>" +
+                    "<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\">" +
+                    "<style>body {background-color: #f8e0e6;color: #555;}" +
+                    ".container {background-color: #fff;padding: 20px;border-radius: 5px;margin-top: 50px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);} " +
+                    "input[type=\"text\"], input[type=\"password\"] {width: 100%;padding: 12px 20px;margin: 8px 0;display: inline-block;border: 1px solid #ccc;border-radius: 4px;box-sizing: border-box;}" +
+                    "input[type=\"submit\"] {width: 100%;background-color: #ff1493;color: white;padding: 14px 20px;margin: 8px 0;border: none;border-radius: 4px;cursor: pointer;}</style></head>" +
+                    "<body><div class=\"container\"><h1>Error</h1><div><p><span id=\"errorMessage\">Invalid username or password</span></p><form action=\"/login\" method=\"post\">" +
+                    "<label for=\"loginUsername\">Username:</label><br><input type=\"text\" id=\"loginUsername\" name=\"username\"><br>" +
+                    "<label for=\"loginPassword\">Password:</label><br><input type=\"password\" id=\"loginPassword\" name=\"password\"><br><br>" +
+                    "<input type=\"submit\" value=\"Login\"></form></div></div>" +
+                    "<script src=\"https://code.jquery.com/jquery-3.3.1.slim.min.js\"></script><script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js\"></script>" +
+                    "<script src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js\"></script></body></html>";
+
+            t.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
+            t.sendResponseHeaders(200, response.getBytes().length);
             OutputStream os = t.getResponseBody();
             os.write(response.getBytes());
             os.close();
         }
     }
+
 
 
 }

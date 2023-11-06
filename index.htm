@@ -1,15 +1,49 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Bootstrap Server</title>
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8e0e6; /* Light Pink */
+            color: #555; /* Gray */
+        }
+        .container {
+            background-color: #fff; /* White */
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 50px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        a.btn {
+            color: #fff; /* White */
+        }
+        a.btn-primary {
+            background-color: #ff1493; /* Darker Pink */
+        }
+        a.btn-secondary {
+            background-color: #555; /* Gray */
+        }
+    </style>
 </head>
+
 <body>
-<h1>Welcome to the Bootstrap Server</h1>
-<p>This is a simple example of using Bootstrap with a Java server.</p>
-<div>
-    <h3>Choose an option</h3>
-    <a href="/register">Register</a><br>
-    <a href="/login">Login</a>
+<div class="container">
+    <h1 class="mt-5">Welcome to the Bootstrap Server</h1>
+    <p>This is a simple example of using Bootstrap with a Java server.</p>
+    <div class="mt-4">
+        <h3>Choose an option</h3>
+        <a href="/register" class="btn btn-primary mr-2">Register</a>
+        <a href="/login" class="btn btn-secondary">Login</a>
+    </div>
 </div>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
+
 </html>
