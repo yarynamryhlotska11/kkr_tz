@@ -86,7 +86,16 @@ public class MainServer {
                 if (params.length > 0) {
                     String[] usernameParams = params[0].split("=");
                     if (usernameParams.length > 1 && !usernameParams[1].isBlank()) {
-                        String username = usernameParams[1];
+                        String username = usernameParams[1].trim();
+                        System.out.println("Username: " + username); // Додайте цей рядок для перевірки формату логіна
+                        if (!username.matches("^[a-zA-Z]*$")) {
+                            response = "<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Error</h1><div><p><span id=\"errorMessage\">Username must contain only English characters</span></p></div></body></html>";
+                            t.sendResponseHeaders(200, response.length());
+                            OutputStream os = t.getResponseBody();
+                            os.write(response.getBytes());
+                            os.close();
+                            return;
+                        }
                         String password = generatePassword();
                         addUser(username, password);
                         printUserPasswords(); // Виведення зареєстрованих користувачів
