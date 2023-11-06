@@ -73,13 +73,14 @@ public class MainServer {
 
     static class HomeHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-            String response = "<!DOCTYPE html><html><head><title>Bootstrap Server</title></head><body><h1>Welcome to the Bootstrap Server</h1><p>This is a simple example of using Bootstrap with a Java server.</p><div><h3>Choose an option</h3><a href=\"/register\">Register</a><br><a href=\"/login\">Login</a></div></body></html>";
+            String response = "<!DOCTYPE html><html><head><title>Bootstrap Server</title></head><body><div><h3>Choose an option</h3><a href=\"/register\">Register</a><br><a href=\"/login\">Login</a></div></body></html>";
             t.sendResponseHeaders(200, response.length());
             OutputStream os = t.getResponseBody();
             os.write(response.getBytes());
             os.close();
         }
     }
+
 
     static class RegisterHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
