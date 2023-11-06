@@ -23,8 +23,12 @@ public class MainServer {
         server.createContext("/", new HomeHandler());
         server.createContext("/register", new RegisterHandler());
         server.createContext("/login", new LoginHandler());
-        server.createContext("/error", new ErHandler());
         server.createContext("/homepage", new HomePageHandler());
+        server.createContext("/errorreg", new ErRegHandler());
+        server.createContext("/erempty", new ErEmptyHandler());
+        server.createContext("/error", new ErHandler());
+
+
 
         server.setExecutor(null);
         server.start();
@@ -85,38 +89,34 @@ public class MainServer {
                 String[] params = requestBody.split("&");
                 if (params.length > 0) {
                     String[] usernameParams = params[0].split("=");
-                    if (usernameParams.length > 1 && !usernameParams[1].isBlank()) {
+                    if (usernameParams.length > 1) {
                         String username = usernameParams[1].trim();
-                        System.out.println("Username: " + username); // Додайте цей рядок для перевірки формату логіна
-                        if (!username.matches("^[a-zA-Z]*$")) {
-                            response = "<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Error</h1><div><p><span id=\"errorMessage\">Username must contain only English characters</span></p></div></body></html>";
-                            t.sendResponseHeaders(200, response.length());
-                            OutputStream os = t.getResponseBody();
-                            os.write(response.getBytes());
-                            os.close();
+                        if (username.isEmpty()) {
+                            t.getResponseHeaders().set("Location", "/erempty");
+                            t.sendResponseHeaders(302, -1); // Redirect to error page if field is empty
+                            return;
+                        } else if (!username.matches("^[a-zA-Z]*$")) {
+                            t.getResponseHeaders().set("Location", "/errorreg");
+                            t.sendResponseHeaders(302, -1); // Redirect to error page for registration
                             return;
                         }
                         String password = generatePassword();
                         addUser(username, password);
-                        printUserPasswords(); // Виведення зареєстрованих користувачів
+                        printUserPasswords(); // Display registered users
                         response = "<!DOCTYPE html><html><head><title>Success</title><meta http-equiv=\"refresh\" content=\"60; url=/login\"></head><body><h1>Success</h1><div><p>You have successfully registered. Your password: " + password + "</p><p>Redirecting to login page...</p></div></body></html>";
                         t.sendResponseHeaders(200, response.length());
                         OutputStream os = t.getResponseBody();
                         os.write(response.getBytes());
                         os.close();
                     } else {
-                        response = "<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Error</h1><div><p><span id=\"errorMessage\">Username must be filled</span></p></div></body></html>";
-                        t.sendResponseHeaders(200, response.length());
-                        OutputStream os = t.getResponseBody();
-                        os.write(response.getBytes());
-                        os.close();
+                        t.getResponseHeaders().set("Location", "/er");
+                        t.sendResponseHeaders(302, -1); // Redirect to error page if field is empty
+                        return;
                     }
                 } else {
-                    response = "<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Error</h1><div><p><span id=\"errorMessage\">Data must be filled</span></p></div></body></html>";
-                    t.sendResponseHeaders(200, response.length());
-                    OutputStream os = t.getResponseBody();
-                    os.write(response.getBytes());
-                    os.close();
+                    t.getResponseHeaders().set("Location", "/er");
+                    t.sendResponseHeaders(302, -1); // Redirect to error page if field is empty
+                    return;
                 }
             } else {
                 response = "<!DOCTYPE html><html><head><title>Registration</title></head><body><h1>Registration</h1><div><form action=\"/register\" method=\"post\"><label for=\"registerUsername\">Username:</label><br><input type=\"text\" id=\"registerUsername\" name=\"username\"><br><br><input type=\"submit\" value=\"Register\"></form></div></body></html>";
@@ -128,6 +128,25 @@ public class MainServer {
         }
     }
 
+    static class ErEmptyHandler implements HttpHandler {
+        public void handle(HttpExchange t) throws IOException {
+            String response = "<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Error</h1><div><p><span id=\"errorMessage\">Field must not be empty</span></p><form action=\"/register\" method=\"post\"><label for=\"registerUsername\">Username:</label><br><input type=\"text\" id=\"registerUsername\" name=\"username\"><br><br><input type=\"submit\" value=\"Register\"></form></div></body></html>";
+            t.sendResponseHeaders(200, response.length());
+            OutputStream os = t.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        }
+    }
+
+    static class ErRegHandler implements HttpHandler {
+        public void handle(HttpExchange t) throws IOException {
+            String response = "<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Error</h1><div><p><span id=\"errorMessage\">Username must be filled and contain only English characters</span></p><form action=\"/register\" method=\"post\"><label for=\"registerUsername\">Username:</label><br><input type=\"text\" id=\"registerUsername\" name=\"username\"><br><br><input type=\"submit\" value=\"Register\"></form></div></body></html>";
+            t.sendResponseHeaders(200, response.length());
+            OutputStream os = t.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        }
+    }
 
 
 
@@ -166,15 +185,6 @@ public class MainServer {
         }
     }
 
-    static class ErHandler implements HttpHandler {
-        public void handle(HttpExchange t) throws IOException {
-            String response = "<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Error</h1><div><p><span id=\"errorMessage\">Invalid username or password</span></p><form action=\"/login\" method=\"post\"><label for=\"loginUsername\">Username:</label><br><input type=\"text\" id=\"loginUsername\" name=\"username\"><br><label for=\"loginPassword\">Password:</label><br><input type=\"password\" id=\"loginPassword\" name=\"password\"><br><br><input type=\"submit\" value=\"Login\"></form></div></body></html>";
-            t.sendResponseHeaders(200, response.length());
-            OutputStream os = t.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
-        }
-    }
 
     static class HomePageHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
@@ -185,4 +195,16 @@ public class MainServer {
             os.close();
         }
     }
+    static class ErHandler implements HttpHandler {
+        public void handle(HttpExchange t) throws IOException {
+            String response = "<!DOCTYPE html><html><head><title>Error</title></head><body><h1>Error</h1><div><p><span id=\"errorMessage\">Invalid username or password</span></p><form action=\"/login\" method=\"post\"><label for=\"loginUsername\">Username:</label><br><input type=\"text\" id=\"loginUsername\" name=\"username\"><br><label for=\"loginPassword\">Password:</label><br><input type=\"password\" id=\"loginPassword\" name=\"password\"><br><br><input type=\"submit\" value=\"Login\"></form></div></body></html>";
+            t.sendResponseHeaders(200, response.length());
+            OutputStream os = t.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        }
+    }
+
+
 }
+

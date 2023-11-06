@@ -6,11 +6,13 @@
 <body>
 <h1>Error</h1>
 <div>
-    <p><span id="errorMessage"></span></p>
-    <form action="/register" method="post">
-        <label for="registerUsername">Username:</label><br>
-        <input type="text" id="registerUsername" name="username"><br><br>
-        <input type="submit" value="Register">
+    <p><span id="errorMessage">Invalid username or password</span></p>
+    <form action="/login" method="post">
+        <label for="loginUsername">Username:</label><br>
+        <input type="text" id="loginUsername" name="username"><br>
+        <label for="loginPassword">Password:</label><br>
+        <input type="password" id="loginPassword" name="password"><br><br>
+        <input type="submit" value="Login">
     </form>
 </div>
 </body>
