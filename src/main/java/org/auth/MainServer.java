@@ -99,7 +99,7 @@ public class MainServer {
                         String password = generatePassword();
                         addUser(username, password);
                         printUserPasswords(); // Виведення зареєстрованих користувачів
-                        response = "<!DOCTYPE html><html><head><title>Success</title></head><body><h1>Success</h1><div><p>You have successfully registered. Your password: " + password + "</p></div></body></html>";
+                        response = "<!DOCTYPE html><html><head><title>Success</title><meta http-equiv=\"refresh\" content=\"60; url=/login\"></head><body><h1>Success</h1><div><p>You have successfully registered. Your password: " + password + "</p><p>Redirecting to login page...</p></div></body></html>";
                         t.sendResponseHeaders(200, response.length());
                         OutputStream os = t.getResponseBody();
                         os.write(response.getBytes());
@@ -127,6 +127,7 @@ public class MainServer {
             }
         }
     }
+
 
 
 
