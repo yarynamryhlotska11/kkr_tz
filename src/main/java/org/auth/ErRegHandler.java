@@ -6,7 +6,7 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.io.OutputStream;
 
- class ErRegHandler implements HttpHandler {
+ public class ErRegHandler implements HttpHandler {
     public void handle(HttpExchange t) throws IOException {
         String response = "<!DOCTYPE html><html><head><title>Error</title>" +
                 "<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\">" +

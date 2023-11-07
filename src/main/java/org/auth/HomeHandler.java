@@ -6,7 +6,7 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.io.OutputStream;
 
-class HomeHandler implements HttpHandler {
+public class HomeHandler implements HttpHandler {
     public void handle(HttpExchange t) throws IOException {
         String response = "<!DOCTYPE html><html><head><title>Bootstrap Server</title>" +
                 "<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\">" +

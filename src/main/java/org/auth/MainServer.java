@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Random;
 
 public class MainServer {
-    static Map<String, String> userPasswords = new HashMap<>();
+    public static Map<String, String> userPasswords = new HashMap<>();
     static Map<String, String> userSalts = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
@@ -31,11 +31,11 @@ public class MainServer {
     public static void printUserPasswords() {
         System.out.println("Registered Users:");
         for (Map.Entry<String, String> entry : userPasswords.entrySet()) {
-            System.out.println("Username: " + entry.getKey() + ", Password: " + entry.getValue() + ", Salt: " + userSalts.get(entry.getKey()));
+            System.out.println("Username: " + entry.getKey() + ", Password: " + entry.getValue());
         }
     }
 
-    static String generateSalt() {
+    public static String generateSalt() {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
         random.nextBytes(salt);
@@ -43,7 +43,7 @@ public class MainServer {
     }
 
     // Return the password hash using the salt
-    static String hashPassword(String password, String salt) {
+    public static String hashPassword(String password, String salt) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             String toHash = password + salt;
@@ -55,14 +55,14 @@ public class MainServer {
         return null;
     }
 
-    static void addUser(String username, String password) {
+    public static void addUser(String username, String password) {
         String salt = generateSalt(); /// Salt generation
         String hashedPassword = hashPassword(password, salt); // Hashing password with salt
         userPasswords.put(username.trim(), hashedPassword.trim()); // Store the hashed password for the user
         userSalts.put(username.trim(), salt); // Save the salt for the user
     }
 
-    static String generatePassword() {
+    public static String generatePassword() {
         Random random = new Random();
         int code = 100000 + random.nextInt(900000);
         return String.valueOf(code); // Return the password in string format

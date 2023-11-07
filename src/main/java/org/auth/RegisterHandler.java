@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import static org.auth.MainServer.*;
 
-class RegisterHandler implements HttpHandler {
+public class RegisterHandler implements HttpHandler {
     public void handle(HttpExchange t) throws IOException {
         String response = "<!DOCTYPE html><html><head><title>Registration</title>" +
                 "<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\">" +

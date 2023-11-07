@@ -9,7 +9,7 @@ import java.util.Map;
 
 import static org.auth.MainServer.*;
 
-class LoginHandler implements HttpHandler {
+public class LoginHandler implements HttpHandler {
     public void handle(HttpExchange t) throws IOException {
         if (t.getRequestMethod().equals("POST")) {
             String requestBody = Utils.convertStreamToString(t.getRequestBody());
