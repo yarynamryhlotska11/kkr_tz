@@ -6,13 +6,16 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.io.OutputStream;
 
- public class HomePageHandler implements HttpHandler {
+public class HomePageHandler implements HttpHandler {
     public void handle(HttpExchange t) throws IOException {
         String response = "<!DOCTYPE html><html><head><title>Home Page</title>" +
                 "<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\">" +
                 "<style>body {background-color: #f8e0e6;color: #555;}" +
-                ".container {background-color: #fff;padding: 20px;border-radius: 5px;margin-top: 50px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);}</style></head>" +
-                "<body><div class=\"container\"><h1>Home Page</h1><div><p>Welcome to the home page</p></div></div>" +
+                ".container {background-color: #fff;padding: 20px;border-radius: 5px;margin-top: 50px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);}" +
+                ".contact-info {position: absolute; bottom: 10px; left: 10px;}" +
+                "</style></head>" +
+                "<body><div class=\"container\"><h1>Home Page</h1><div><p>Welcome to the home page</p></div>" +
+                "<div class=\"contact-info\"><p>For support, please contact yaryna.mryhlotska.it.2021@lpnu.ua</p></div></div>" +
                 "<script src=\"https://code.jquery.com/jquery-3.3.1.slim.min.js\"></script><script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js\"></script>" +
                 "<script src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js\"></script></body></html>";
 

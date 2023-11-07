@@ -36,6 +36,7 @@ public class LoginHandler implements HttpHandler {
                     "<label for=\"loginUsername\">Username:</label><br><input type=\"text\" id=\"loginUsername\" name=\"username\"><br>" +
                     "<label for=\"loginPassword\">Password:</label><br><input type=\"password\" id=\"loginPassword\" name=\"password\"><br><br>" +
                     "<input type=\"submit\" value=\"Login\"></form></div></div>" +
+                    "<p style=\"position: absolute; bottom: 20px; left: 20px;\">For support, please contact yaryna.mryhlotska.it.2021@lpnu.ua</p>" +
                     "<script src=\"https://code.jquery.com/jquery-3.3.1.slim.min.js\"></script><script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js\"></script>" +
                     "<script src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js\"></script></body></html>";
 
@@ -47,4 +48,3 @@ public class LoginHandler implements HttpHandler {
         }
     }
 }
-
